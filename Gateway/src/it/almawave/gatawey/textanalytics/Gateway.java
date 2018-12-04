@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import javax.activation.DataHandler;
 import javax.ejb.EJB;
+import javax.mail.util.ByteArrayDataSource;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.transaction.SystemException;
@@ -14,11 +16,20 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
 import org.apache.commons.io.FileUtils;
 import org.jboss.logging.Logger;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import it.almawave.gatawey.textanalytics.bean.DoRequestINBean;
+
+import it.almawave.gatawey.asr.ServiceUpload;
 import it.almawave.gateway.db.GatewayInternalDb;
+import it.almawave.gateway.db.bean.DoRequestBean;
+import it.pervoice.audiomabox.commontypes._1.FileType;
+import it.pervoice.audiomabox.services.common._1.ClientInfoType;
+import it.pervoice.audiomabox.services.upload._1.UploadRequest;
+import it.pervoice.audiomabox.services.upload._1.UploadRequest.RemoteFile;
+import it.pervoice.audiomabox.services.upload._1.UploadResponse;
+import it.pervoice.ws.audiomabox.service.upload._1.UploadFault;
+import it.pervoice.ws.audiomabox.service.upload._1.UploadWS;
 
 @Path("/service")
 public class Gateway {
@@ -39,21 +50,49 @@ public class Gateway {
 	@POST
 	@Path("doRequest")
 	@Consumes({MediaType.APPLICATION_JSON})
-	public String doRequest(DoRequestINBean request) throws IOException{
+	public String doRequest(DoRequestBean request) throws IOException{
 		LOGGER.info("[Service doRequest INVOKED]");
+		String response = "";
 		try {
+			
 			//leggi file audio
 			File file = new File(request.getPercorsoFileAudio()); 
 	        byte[] data = FileUtils.readFileToByteArray(file);
+	        ByteArrayDataSource rawData = new ByteArrayDataSource(data,"application/octet-stream");
  		
-	        ObjectMapper objectMapper = new ObjectMapper();
+	        //invocare il servizio uploadService
+	        UploadWS service = new ServiceUpload().getService(); 
+	        //request
+	        UploadRequest uploadRequest = new UploadRequest();
+	        //clientInfo
+	        ClientInfoType clientInfoType = new ClientInfoType();
+	        uploadRequest.setClientInfo(clientInfoType);
+	        //file
+	        RemoteFile remoteFile = new RemoteFile();
+	        FileType fileType = new FileType(); 
+	        fileType.setName(file.getName());
+	        DataHandler dataHandler =  new DataHandler(rawData);
+	        fileType.setData(dataHandler);
+	        remoteFile.setFile(fileType);
+	        uploadRequest.setRemoteFile(remoteFile);
+	        
+	        //TODO: da finire il popolamento della request
+	        UploadResponse uploadResponse = service.upload(uploadRequest);
+	        String id = String.valueOf(uploadResponse.getJobElement().get(0).getJobId());
+	        
+	        response = gatewayInternalDbEjb.doRequest(request, id);
+	        
+	        
 		}catch (FileNotFoundException e) {
 			return "File audio non trovato";
+		} catch (UploadFault e) {
+			e.printStackTrace();
+			return "Errore nella chiata al servizio Upload di PerVoice";
 		} finally {
 			LOGGER.info("[Service doRequest ENDED]");
 		}
 		
-		return "Identificativo univoco della richiesta";
+		return response;
 	}
 	
 	
@@ -62,16 +101,18 @@ public class Gateway {
 	@Consumes({MediaType.APPLICATION_JSON})
 	public String getStatus(String idRichiesta) throws IOException{
 		LOGGER.info("[Service getStatus INVOKED]");
+		String response = "";
+		try {
 		
-//		Stato della richiesta:
-//		Ricevuta
-//		In attesa di lavorazione
-//		In lavorazione
-//		Completata
+			response = gatewayInternalDbEjb.getStatus(idRichiesta);
 		
-		LOGGER.info("[Service getStatus ENDED]");
-
-		return "Ricevuta";
+		}catch (Exception e) {
+			return "Errore ";
+		}finally {
+			LOGGER.info("[Service getStatus ENDED]");
+		}
+		
+		return response;
 	}
 	
 	@GET
@@ -97,7 +138,6 @@ public class Gateway {
 	//@Produces(MediaType.TEXT_PLAIN)
 	public Response sayPlainTextHello() throws IOException, IllegalStateException, SecurityException, SystemException {
 		//gatewayInternalDbEjb.insertRequestStatus();
-		gatewayInternalDbEjb.insertRequest();
 		String responseString="Gateway service up and running";
 		Response result =Response.status(200).entity(responseString).build();
 		return result;
