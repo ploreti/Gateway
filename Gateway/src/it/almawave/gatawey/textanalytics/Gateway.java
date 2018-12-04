@@ -96,7 +96,7 @@ public class Gateway {
 	@Path("test")
 	//@Produces(MediaType.TEXT_PLAIN)
 	public Response sayPlainTextHello() throws IOException, IllegalStateException, SecurityException, SystemException {
-		//gatewayInternalDbEjb.insertRequestStatus();
+		gatewayInternalDbEjb.insertRequestStatus();
 		gatewayInternalDbEjb.insertRequest();
 		String responseString="Gateway service up and running";
 		Response result =Response.status(200).entity(responseString).build();
