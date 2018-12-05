@@ -99,6 +99,7 @@ public class Gateway {
 
 		//gatewayInternalDbEjb.insertRequestStatus();
 		String responseString="Gateway service up and running";
+		gatewayInternalDbEjb.tester();
 		Response result =Response.status(200).entity(responseString).build();
 		return result;
 	}
