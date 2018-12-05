@@ -45,6 +45,7 @@ public class Gateway {
 			response = gatewayInternalDbEjb.doRequest(request);
 			
 		}catch (Exception e) {
+			e.printStackTrace();
 			return "Errore " + e.getMessage();
 		}finally {
 			LOGGER.info("[Service doRequest ENDED]");
@@ -64,6 +65,7 @@ public class Gateway {
 			response = gatewayInternalDbEjb.getStatus(idDifformita);
 		
 		}catch (Exception e) {
+			e.printStackTrace();
 			return "Errore " + e.getMessage();
 		}finally {
 			LOGGER.info("[Service getStatus ENDED]");
