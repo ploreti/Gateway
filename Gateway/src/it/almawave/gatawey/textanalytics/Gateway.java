@@ -1,7 +1,5 @@
 package it.almawave.gatawey.textanalytics;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import javax.ejb.EJB;
@@ -16,8 +14,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.commons.io.FileUtils;
 import org.jboss.logging.Logger;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import it.almawave.gatawey.textanalytics.bean.DoRequestINBean;
+
 import it.almawave.gateway.db.GatewayInternalDb;
 
 @Path("/service")
@@ -39,39 +36,41 @@ public class Gateway {
 	@POST
 	@Path("doRequest")
 	@Consumes({MediaType.APPLICATION_JSON})
-	public String doRequest(DoRequestINBean request) throws IOException{
+	public String doRequest(DoRequestBean request) throws IOException{
 		LOGGER.info("[Service doRequest INVOKED]");
+		String response = "";
 		try {
-			//leggi file audio
-			File file = new File(request.getPercorsoFileAudio()); 
-	        byte[] data = FileUtils.readFileToByteArray(file);
- 		
-	        ObjectMapper objectMapper = new ObjectMapper();
-		}catch (FileNotFoundException e) {
-			return "File audio non trovato";
-		} finally {
+			
+			response = gatewayInternalDbEjb.doRequest(request);
+			
+		}catch (Exception e) {
+			e.printStackTrace();
+			return "Errore " + e.getMessage();
+		}finally {
 			LOGGER.info("[Service doRequest ENDED]");
 		}
-		
-		return "Identificativo univoco della richiesta";
+		return response;
 	}
 	
 	
 	@GET
 	@Path("getStatus")
 	@Consumes({MediaType.APPLICATION_JSON})
-	public String getStatus(String idRichiesta) throws IOException{
+	public String getStatus(String idDifformita) throws IOException{
 		LOGGER.info("[Service getStatus INVOKED]");
+		String response = "";
+		try {
 		
-//		Stato della richiesta:
-//		Ricevuta
-//		In attesa di lavorazione
-//		In lavorazione
-//		Completata
+			response = gatewayInternalDbEjb.getStatus(idDifformita);
 		
-		LOGGER.info("[Service getStatus ENDED]");
-
-		return "Ricevuta";
+		}catch (Exception e) {
+			e.printStackTrace();
+			return "Errore " + e.getMessage();
+		}finally {
+			LOGGER.info("[Service getStatus ENDED]");
+		}
+		
+		return response;
 	}
 	
 	@GET
@@ -96,8 +95,7 @@ public class Gateway {
 	@Path("test")
 	//@Produces(MediaType.TEXT_PLAIN)
 	public Response sayPlainTextHello() throws IOException, IllegalStateException, SecurityException, SystemException {
-		gatewayInternalDbEjb.insertRequestStatus();
-		gatewayInternalDbEjb.insertRequest();
+		gatewayInternalDbEjb.callIrideTextAnalytic();
 		String responseString="Gateway service up and running";
 		Response result =Response.status(200).entity(responseString).build();
 		return result;
