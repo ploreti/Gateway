@@ -12,10 +12,11 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.apache.commons.io.FileUtils;
+
 import org.jboss.logging.Logger;
 
 import it.almawave.gateway.db.GatewayInternalDb;
+import it.almawave.gateway.db.bean.DoRequestBean;
 
 @Path("/service")
 public class Gateway {
@@ -95,7 +96,8 @@ public class Gateway {
 	@Path("test")
 	//@Produces(MediaType.TEXT_PLAIN)
 	public Response sayPlainTextHello() throws IOException, IllegalStateException, SecurityException, SystemException {
-		gatewayInternalDbEjb.callIrideTextAnalytic();
+
+		//gatewayInternalDbEjb.insertRequestStatus();
 		String responseString="Gateway service up and running";
 		Response result =Response.status(200).entity(responseString).build();
 		return result;
