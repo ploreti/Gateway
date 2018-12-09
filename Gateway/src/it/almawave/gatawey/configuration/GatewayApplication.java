@@ -10,10 +10,6 @@ public class GatewayApplication extends Application{
     public Set<Class<?>> getClasses() {
         Set<Class<?>> sets = new HashSet<Class<?>>();
         sets.add(it.almawave.gatawey.textanalytics.Gateway.class);
-//        sets.add(it.almawave.iride.es.Tester.class);
-//        sets.add(it.almawave.iride.km.KMWrapperAPI.class);
-//        sets.add(it.almawave.iride.es.ESWrapperAPI.class);
-//        sets.add(it.almawave.iit.utility.WebAppService.class);
         return sets;
     }
 }

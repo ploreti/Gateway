@@ -1,7 +1,6 @@
 package it.almawave.gatawey.textanalytics;
 
 import java.io.IOException;
-
 import javax.ejb.EJB;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -15,7 +14,7 @@ import javax.ws.rs.core.Response;
 
 import org.jboss.logging.Logger;
 
-import it.almawave.gateway.db.GatewayInternalDb;
+import it.almawave.gateway.GatewayServices;
 import it.almawave.gateway.db.bean.DoRequestBean;
 
 @Path("/service")
@@ -23,12 +22,12 @@ public class Gateway {
 	
 	private static final Logger LOGGER = Logger.getLogger(Gateway.class);
 	@EJB
-	GatewayInternalDb gatewayInternalDbEjb;
+	GatewayServices gatewayServicesEjb;
 	
 	public Gateway() {
 		try {
-			String gatewayInternalDbLookupName = "java:global/GatewayPackage/GatewayEjb/GatewayInternalDb!it.almawave.gateway.db.GatewayInternalDb";
-			gatewayInternalDbEjb = (GatewayInternalDb) InitialContext.doLookup(gatewayInternalDbLookupName);
+			String gatewayServicesLookupName = "java:global/GatewayPackage/GatewayEjb/GatewayServices!it.almawave.gateway.GatewayServices";
+			gatewayServicesEjb = (GatewayServices) InitialContext.doLookup(gatewayServicesLookupName);
 		} catch (NamingException e) {
 			e.printStackTrace();
 		}	
@@ -42,7 +41,7 @@ public class Gateway {
 		String response = "";
 		try {
 			
-			response = gatewayInternalDbEjb.doRequest(request);
+			response = gatewayServicesEjb.doRequest(request);
 			
 		}catch (Exception e) {
 			e.printStackTrace();
@@ -62,7 +61,7 @@ public class Gateway {
 		String response = "";
 		try {
 		
-			response = gatewayInternalDbEjb.getStatus(idDifformita);
+			response = gatewayServicesEjb.getStatus(idDifformita);
 		
 		}catch (Exception e) {
 			e.printStackTrace();
@@ -98,9 +97,12 @@ public class Gateway {
 	public Response sayPlainTextHello() throws IOException, IllegalStateException, SecurityException, SystemException {
 
 		//gatewayInternalDbEjb.insertRequestStatus();
-		String responseString="Gateway service up and running";
-		gatewayInternalDbEjb.tester();
+		//String responseString="Gateway service up and running";
+		//gatewayInternalDbEjb.tester();
+		String responseString=gatewayServicesEjb.startClassification();
 		Response result =Response.status(200).entity(responseString).build();
 		return result;
 	}
+	
+
 }
