@@ -16,6 +16,7 @@ import org.jboss.logging.Logger;
 
 import it.almawave.gateway.GatewayServices;
 import it.almawave.gateway.db.bean.DoRequestBean;
+import it.almawave.gateway.db.excption.DbException;
 
 @Path("/service")
 public class Gateway {
@@ -94,12 +95,12 @@ public class Gateway {
 	@GET
 	@Path("test")
 	//@Produces(MediaType.TEXT_PLAIN)
-	public Response sayPlainTextHello() throws IOException, IllegalStateException, SecurityException, SystemException {
+	public Response sayPlainTextHello() throws IOException, IllegalStateException, SecurityException, SystemException, DbException {
 
 		//gatewayInternalDbEjb.insertRequestStatus();
 		//String responseString="Gateway service up and running";
-		//gatewayInternalDbEjb.tester();
-		String responseString=gatewayServicesEjb.startClassification();
+		//String responseString = gatewayServicesEjb.tester();
+		String responseString = gatewayServicesEjb.startClassification();
 		Response result =Response.status(200).entity(responseString).build();
 		return result;
 	}
