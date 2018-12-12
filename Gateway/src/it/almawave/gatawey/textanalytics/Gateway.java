@@ -62,6 +62,7 @@ public class Gateway {
 		String response = "";
 		try {
 		
+			LOGGER.info("_____________________ idDifformita " +idDifformita);
 			response = gatewayServicesEjb.getStatus(idDifformita);
 		
 		}catch (Exception e) {
@@ -77,19 +78,23 @@ public class Gateway {
 	@GET
 	@Path("getResponse")
 	@Consumes({MediaType.APPLICATION_JSON})
-	public String getResponse(String idRichiesta) throws IOException{
+	public String getResponse(String idDifformita) throws IOException{
 		LOGGER.info("[Service getResponse INVOKED]");
 		
+		String response = "";
+		try {
 		
-//		Nota audio trascritta 
-//		Tre triplette di classificazione e Ranking associato
-//		Concetti
-//		Entità
-
+			LOGGER.info("_____________________ idDifformita " +idDifformita);
+			response = gatewayServicesEjb.getResponse(idDifformita);
 		
-		LOGGER.info("[Service getResponse ENDED]");
+		}catch (Exception e) {
+			e.printStackTrace();
+			return "Errore " + e.getMessage();
+		}finally {
+			LOGGER.info("[Service getResponse ENDED]");
+		}
 		
-		return "da tornare oggetto json";
+		return response;
 	}
 	
 	@GET
@@ -101,7 +106,7 @@ public class Gateway {
 		//String responseString="Gateway service up and running";
 		//String responseString = gatewayServicesEjb.tester();
 		String responseString = gatewayServicesEjb.startClassification();
-		Response result =Response.status(200).entity(responseString).build();
+		Response result = Response.status(200).entity(responseString).build();
 		return result;
 	}
 	
