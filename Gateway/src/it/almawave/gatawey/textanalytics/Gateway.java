@@ -15,6 +15,7 @@ import javax.ws.rs.core.Response;
 import org.jboss.logging.Logger;
 
 import it.almawave.gateway.GatewayServices;
+import it.almawave.gateway.configuration.PropertiesBean;
 import it.almawave.gateway.db.bean.DoRequestBean;
 import it.almawave.gateway.db.excption.DbException;
 
@@ -25,10 +26,18 @@ public class Gateway {
 	@EJB
 	GatewayServices gatewayServicesEjb;
 	
+	@EJB
+	PropertiesBean propertiesBean;
+	
 	public Gateway() {
 		try {
 			String gatewayServicesLookupName = "java:global/GatewayPackage/GatewayEjb/GatewayServices!it.almawave.gateway.GatewayServices";
 			gatewayServicesEjb = (GatewayServices) InitialContext.doLookup(gatewayServicesLookupName);
+			
+			
+			String propertieservicesLookupName = "java:global/GatewayPackage/GatewayEjb/PropertiesBean!it.almawave.gateway.configuration.PropertiesBean";
+			propertiesBean = (PropertiesBean) InitialContext.doLookup(propertieservicesLookupName);
+			
 		} catch (NamingException e) {
 			e.printStackTrace();
 		}	
@@ -104,9 +113,18 @@ public class Gateway {
 
 		//gatewayInternalDbEjb.insertRequestStatus();
 		//String responseString="Gateway service up and running";
-		//String responseString = gatewayServicesEjb.tester();
-		String responseString = gatewayServicesEjb.startClassification();
+		String responseString = gatewayServicesEjb.tester();
+		//String responseString = gatewayServicesEjb.startClassification();
 		Response result = Response.status(200).entity(responseString).build();
+		return result;
+	}
+	
+	
+	@GET
+	@Path("resetParameters")
+	public Response resetParameters() {
+		propertiesBean.resetHashParametroSistema();
+		Response result = Response.status(200).entity("reset finisced").build();
 		return result;
 	}
 	
