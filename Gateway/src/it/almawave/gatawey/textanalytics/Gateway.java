@@ -125,7 +125,7 @@ public class Gateway {
 	@Path("resetParameters")
 	public Response resetParameters() {
 		propertiesBean.resetHashParametroSistema();
-		Response result = Response.status(200).entity("reset finisced").build();
+		Response result = Response.status(200).entity("reset fnished").build();
 		return result;
 	}
 	
