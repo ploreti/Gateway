@@ -9,6 +9,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -65,8 +66,8 @@ public class Gateway {
 	
 	@GET
 	@Path("getStatus")
-	@Consumes({MediaType.APPLICATION_JSON})
-	public String getStatus(String idDifformita) throws IOException{
+//	@Consumes({MediaType.APPLICATION_JSON})
+	public String getStatus(@QueryParam("idDifformita") String idDifformita) throws IOException{
 		LOGGER.info("[Service getStatus INVOKED]");
 		String response = "";
 		try {
@@ -86,8 +87,8 @@ public class Gateway {
 	
 	@GET
 	@Path("getResponse")
-	@Consumes({MediaType.APPLICATION_JSON})
-	public String getResponse(String idDifformita) throws IOException{
+//	@Consumes({MediaType.APPLICATION_JSON})
+	public String getResponse(@QueryParam("idDifformita") String idDifformita) throws IOException{
 		LOGGER.info("[Service getResponse INVOKED]");
 		
 		String response = "";
